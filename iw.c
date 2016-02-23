@@ -23,8 +23,14 @@
 #include "nl80211.h"
 #include "iw.h"
 
+#ifdef CONFIG_LIBNL_TINY
+#define nl_handle nl_sock
+#define nl_handle_alloc_cb nl_socket_alloc_cb
+#define nl_handle_destroy nl_socket_free
+#endif
+
 /* libnl 1.x compatibility code */
-#if !defined(CONFIG_LIBNL20) && !defined(CONFIG_LIBNL30)
+#if !defined(CONFIG_LIBNL20) && !defined(CONFIG_LIBNL30) && !defined(CONFIG_LIBNL_TINY)
 static inline struct nl_handle *nl_socket_alloc(void)
 {
 	return nl_handle_alloc();
@@ -40,7 +46,7 @@ static inline int nl_socket_set_buffer_size(struct nl_sock *sk,
 {
 	return nl_set_buffer_size(sk, rxbuf, txbuf);
 }
-#endif /* CONFIG_LIBNL20 && CONFIG_LIBNL30 */
+#endif /* CONFIG_LIBNL20 && CONFIG_LIBNL30 && CONFIG_LIBNL_TINY */
 
 int iw_debug = 0;
 
